@@ -2,15 +2,16 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
-import mongoose from 'mongoose';
-import Product from './models/product.model.js';
 import productRoute from './routes/product.route.js';
+import connectDB from './config/db.js';
+import authRoute from './routes/auth.route.js';
 // import csurf from 'csurf';
 // import cookieParser from 'cookie-parser';
 
+const PORT = process.env.PORT || 3000;
 dotenv.config();
-
 const app = express();
+connectDB();
 
 //middlewares
 app.use(express.json());
@@ -21,6 +22,8 @@ app.use(helmet());
 //routes
 app.use('/api/products', productRoute);
 
+//auth routes
+app.use('/api/auth', authRoute);
 
 app.get('/', (req, res) => {
     res.json({
@@ -28,14 +31,7 @@ app.get('/', (req, res) => {
     });
 });
 
-mongoose.connect("mongodb+srv://admin:zOtsESlmD46zvstW@backenddb.wulqw.mongodb.net/Node-API?retryWrites=true&w=majority&appName=BackendDB")
-.then(() => {
-    console.log(`Conected to the database.`);
-}).catch(() => {
-    console.log('Connection failed!')
-});
-
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log('Server running on 3000');
 })
 
