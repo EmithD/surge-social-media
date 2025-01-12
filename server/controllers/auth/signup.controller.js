@@ -41,7 +41,8 @@ export const signUp = async (req, res) => {
             firebaseUid: firebaseUser.uid,
         });
 
-        const { password: _, ...userWithoutPassword } = user.toObject();
+        //... -> spread operator
+        const { password: _, ...userWithoutPassword } = user.toObject();  
         res.status(201).json(userWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error' });
