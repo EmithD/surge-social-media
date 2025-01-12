@@ -1,0 +1,10 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+
+# Dependency directories
+node_modules/
