@@ -43,7 +43,9 @@ export const signIn = async (req, res) => {
         await signInWithEmailAndPassword(auth, user.email, password)
             .then((userCredential) => userCredential.user)
             .catch((error) => {
-                throw new Error(error.message);
+                
+                return res.status(400).json({ message: error.message });
+
             });
 
         const token = generateToken(user);

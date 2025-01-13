@@ -8,7 +8,7 @@
     "dev": "nodemon server"
   },
   "keywords": [],
-  "author": "",
+  "author": "Emith Dinsara",
   "license": "ISC",
   "description": "",
   "dependencies": {
