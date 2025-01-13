@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect }from 'react'
 import { useRouter } from 'next/navigation';
+import useIfAuthRedirect from '../hooks/useIfAuthRedirect';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
 //shit doesnt work without next_public_ prefix
@@ -14,14 +15,7 @@ const SignIn = () => {
 
     const [error, setError] = useState<string>('');
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-
-        if (token) {
-            router.push('/feed');
-        }
-
-    }, [router]);
+    useIfAuthRedirect('/')
 
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,7 +46,7 @@ const SignIn = () => {
 
             localStorage.setItem("token", token);
 
-            router.push("/feed");
+            router.push("/");
 
         } catch (error) {
             setError('An error occurred');
