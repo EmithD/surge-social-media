@@ -15,10 +15,6 @@ const UserSchema = mongoose.Schema(
             type: String,
             required: [true, "Please enter full name"]
         },
-        password: {
-            type: String,
-            required: [true, "Please enter password"]
-        },
         pfp: {
             type: String,
             required: false
@@ -26,7 +22,7 @@ const UserSchema = mongoose.Schema(
         firebaseUid: {
             type: String,
             required: false
-        },
+        }
     },
     {
         timestamps: true
