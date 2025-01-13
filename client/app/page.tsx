@@ -3,13 +3,13 @@
 import React from 'react'
 import useIfAuthRedirect from './hooks/useIfAuthRedirect';
 
-const page = () => {
+const Home = () => {
 
   useIfAuthRedirect('/');
 
   return (
-    <div>page</div>
+    <div>Home</div>
   )
 }
 
-export default page
+export default Home
