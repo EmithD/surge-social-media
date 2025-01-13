@@ -22,7 +22,12 @@ const UserSchema = mongoose.Schema(
         firebaseUid: {
             type: String,
             required: false
-        }
+        },
+        isVerified: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
     },
     {
         timestamps: true
