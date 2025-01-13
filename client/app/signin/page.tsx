@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState, useEffect }from 'react'
+import React, { useState }from 'react'
 import { useRouter } from 'next/navigation';
 import useIfAuthRedirect from '../hooks/useIfAuthRedirect';
+import Link from 'next/link';
+import RightHalf from '../components/RightHalf';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
 //shit doesnt work without next_public_ prefix
+const AUTHOR_NAME = process.env.NEXT_PUBLIC_AUTHOR;
 
 const SignIn = () => {
+
+    useIfAuthRedirect('/');
 
     const [usernameOrEmail, setusernameOrEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -15,13 +20,9 @@ const SignIn = () => {
 
     const [error, setError] = useState<string>('');
 
-    useIfAuthRedirect('/')
-
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
-        console.log(BACKEND_BASE_URL);
 
         try {
 
@@ -72,6 +73,7 @@ const SignIn = () => {
                                     value={ usernameOrEmail }
                                     onChange={ (e) => setusernameOrEmail(e.target.value) }
                                     className="block w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
                                 />
                                 
                                 <input
@@ -81,6 +83,7 @@ const SignIn = () => {
                                     value={ password }
                                     onChange={ (e) => setPassword(e.target.value) }
                                     className="block w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
                                 />
 
                                 { error && <p className='text-red-600 pb-2 text-center'>{error}</p> }
@@ -89,21 +92,18 @@ const SignIn = () => {
                                     type="submit"
                                     className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
                                 >
-                                    Submit
+                                    Sign In
                                 </button>
-
                             </form>
+
+                            <p className='pt-3 text-gray-800 text-center'>New here? <Link href={'/signup'} className='text-blue-800'>Sign Up</Link></p>
 
                         </div>
                     </div>
                 </div>
 
                 {/* Right Section */}
-                <div className="flex flex-col items-center justify-center flex-1 bg-white">
-                    <h1 className="font-bold text-xl mb-2">Surge SE Internship</h1>
-                    <p className="text-gray-500 mb-4">January 2025</p>
-                    <p className="font-bold italic">Emith Dinsara</p>
-                </div>
+                <RightHalf />
             </div>
 
         </main>

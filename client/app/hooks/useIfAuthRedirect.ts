@@ -14,6 +14,6 @@ const useIfAuthRedirect = (redirectPath = '/') => {
             router.push('/signin');
         }
     }, [router, redirectPath]);
-    };
+};
   
 export default useIfAuthRedirect;
