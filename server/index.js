@@ -8,7 +8,7 @@ import authRoute from './routes/auth.route.js';
 // import csurf from 'csurf';
 // import cookieParser from 'cookie-parser';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 dotenv.config();
 const app = express();
 connectDB();
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('Server running on 3000');
+    console.log('Server running on 8080');
 })
 
 
