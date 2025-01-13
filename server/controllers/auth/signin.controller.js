@@ -40,17 +40,22 @@ export const signIn = async (req, res) => {
         }
 
         //firebase auth
-        await signInWithEmailAndPassword(auth, user.email, password)
-            .then((userCredential) => userCredential.user)
-            .catch((error) => {
-                
-                return res.status(400).json({ message: error.message });
-
-            });
+        try {
+            await signInWithEmailAndPassword(auth, user.email, password);
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
 
         const token = generateToken(user);
         
-        const { ...showUser } = user.toObject();
+        const updatedUser = await User.findByIdAndUpdate
+            (
+                user._id, 
+                { isVerified: true },
+                { new: true }
+            );
+
+        const { ...showUser } = updatedUser.toObject();
         res.status(200).json({
             message: "Sign-in successful",
             user: showUser,
