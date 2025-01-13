@@ -36,14 +36,12 @@ export const signUp = async (req, res) => {
             username,
             email,
             fullName,
-            password,
             pfp,
             firebaseUid: firebaseUser.uid,
         });
 
-        //... -> spread operator
-        const { password: _, ...userWithoutPassword } = user.toObject();  
-        res.status(201).json(userWithoutPassword);
+        const {  ...showUser } = user.toObject();
+        res.status(201).json(showUser);
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error' });
     }

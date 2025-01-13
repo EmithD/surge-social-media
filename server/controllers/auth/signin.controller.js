@@ -1,6 +1,24 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import User from "../../models/user.model.js";
 import { app } from "../../config/firebaseConfig.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+
+const auth = getAuth(app);
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+        },
+        JWT_SECRET,
+        { expiresIn: "10h" }
+    );
+};
 
 export const signIn = async (req, res) => {
 
@@ -22,17 +40,51 @@ export const signIn = async (req, res) => {
         }
 
         //firebase auth
-        const auth = getAuth(app);
         await signInWithEmailAndPassword(auth, user.email, password)
             .then((userCredential) => userCredential.user)
             .catch((error) => {
                 throw new Error(error.message);
             });
 
-        const { password: _, ...userWithoutPassword } = user.toObject();
-        res.status(200).json(userWithoutPassword);
+        const token = generateToken(user);
+        
+        const { ...showUser } = user.toObject();
+        res.status(200).json({
+            message: "Sign-in successful",
+            user: showUser,
+            token,
+        });
 
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error' });
+    }
+};
+
+export const signout = async (req, res) => {
+    try {
+        await signOut(auth)
+            .then(() => {
+                res.status(200).json({ message: 'Successfully signed out' });
+            })
+            .catch((error) => {
+                throw new Error(error.message);
+            });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Server error' });
+    }
+};
+
+export const getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const { ...showUser } = user.toObject();
+        res.status(200).json(showUser);
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Server error" });
     }
 };

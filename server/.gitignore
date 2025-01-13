@@ -15,3 +15,5 @@ npm-debug.log*
 # IDE-specific files
 .idea/
 .vscode/
+
+serviceAccountKey.json
