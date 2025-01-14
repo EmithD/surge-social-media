@@ -12,45 +12,48 @@ interface FeedProps {
     children: ReactNode;
 }
 
+interface User {
+    fullName?: string;
+    username?: string;
+}
+
 const FeedBase: React.FC<FeedProps> = ({ children }) => {
     const router = useRouter();
 
-    const [error, setError] = useState<string>('');
-    const [user, setUser] = useState<any>(null);
+    const [, setError] = useState<string>('');
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const getUser = async () => {
-            setError('');
-    
             const token = localStorage.getItem('token');
             if (!token) {
                 router.push('/signin');
                 return;
             }
-    
+
             try {
                 const res = await fetch(`${BACKEND_BASE_URL}/api/auth/profile`, {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
                 });
-        
+
                 if (res.status === 403) {
-                setError('Token expired');
-                localStorage.removeItem("token");
-                router.push('/signin');
+                    setError('Token expired');
+                    localStorage.removeItem('token');
+                    router.push('/signin');
+                    return;
                 }
-        
+
                 const data = await res.json();
                 setUser(data);
-
-            } catch (error) {
+            } catch (err) {
                 setError('Error occurred');
             }
         };
-    
+
         getUser();
     }, [router]);
 
@@ -58,7 +61,7 @@ const FeedBase: React.FC<FeedProps> = ({ children }) => {
 
         localStorage.removeItem('token');
         router.push('/signin');
-        
+
     };
 
 
