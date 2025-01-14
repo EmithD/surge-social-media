@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import productRoute from './routes/product.route.js';
 import connectDB from './config/db.js';
 import authRoute from './routes/auth.route.js';
+import postRoute from './routes/post.route.js'
 // import csurf from 'csurf';
 // import cookieParser from 'cookie-parser';
 
@@ -24,6 +25,9 @@ app.use('/api/products', productRoute);
 
 //auth routes
 app.use('/api/auth', authRoute);
+
+//post routes
+app.use('/api/posts', postRoute)
 
 app.get('/', (req, res) => {
     res.json({
