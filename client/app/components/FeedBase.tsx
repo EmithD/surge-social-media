@@ -7,6 +7,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import { useRouter } from 'next/navigation';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
+import Image from 'next/image';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
 
@@ -161,13 +162,18 @@ const FeedBase: React.FC<FeedProps> = ({ children }) => {
 
     };
 
-
-
     return (
         <div className="flex h-screen">
 
             <div className="w-1/5 bg-gray-100 flex items-start justify-center pt-10">
-                <h1 className="text-lg font-bold">Logo</h1>
+                <Image 
+                    src="/Emith-removebg-preview.png" 
+                    alt="Logo" 
+                    width={200} 
+                    height={200} 
+                    className="object-contain"
+                    priority
+                />
             </div>
 
             {children}
@@ -180,7 +186,6 @@ const FeedBase: React.FC<FeedProps> = ({ children }) => {
                 <p className="text-gray-500">{user?.username || ""}</p>
                 <div className='pt-4'>
                     <ButtonGroup variant="contained" aria-label="Basic button group" size='small'   className=''>
-                        <Button>Home</Button>
                         <Button
                             component="label"
                             role={undefined}
