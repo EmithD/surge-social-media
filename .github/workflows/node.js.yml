@@ -22,9 +22,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Change working directory
-      run: cd /home/ubuntu/actions-runner-backend/_work/surge-social-media/surge-social-media/server
+        # cache: 'npm'
+    - name: Change directory to server
+      run: cd server
     - name: Install dependencies
       run: npm ci
     - name: Set up environment file
