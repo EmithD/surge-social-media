@@ -2,18 +2,15 @@
 
 import React from 'react'
 import useIfAuthRedirect from './hooks/useIfAuthRedirect';
+import FeedBase from './components/FeedBase';
 
 const Home = () => {
 
     useIfAuthRedirect('/')
 
     return (
-        <div className="flex h-screen">
-            {/* Left Sidebar */}
-            <div className="w-1/5 bg-gray-100 flex items-start justify-center pt-10">
-                <h1 className="text-lg font-bold">Logo</h1>
-            </div>
-
+        <FeedBase>
+            
             {/* Main Content */}
             <div className="w-3/5 overflow-y-scroll bg-white">
                 <div className="p-5">
@@ -45,15 +42,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Right Sidebar */}
-            <div className="w-1/5 bg-gray-50 flex flex-col items-center pt-10">
-                <div className="w-24 h-24 rounded-full bg-gray-300 mb-4">
-                Profile Image
-                </div>
-                <h2 className="text-lg font-bold">Profile full name</h2>
-                <p className="text-gray-500">profile username</p>
-            </div>
-        </div>
+        </FeedBase>
     )
 }
 

@@ -16,7 +16,7 @@ const generateToken = (user) => {
             email: user.email,
         },
         JWT_SECRET,
-        { expiresIn: "10h" }
+        { expiresIn: "60s" }
     );
 };
 
@@ -47,15 +47,8 @@ export const signIn = async (req, res) => {
         }
 
         const token = generateToken(user);
-        
-        const updatedUser = await User.findByIdAndUpdate
-            (
-                user._id, 
-                { isVerified: true },
-                { new: true }
-            );
 
-        const { ...showUser } = updatedUser.toObject();
+        const { ...showUser } = user.toObject();
         res.status(200).json({
             message: "Sign-in successful",
             user: showUser,
@@ -69,9 +62,17 @@ export const signIn = async (req, res) => {
 
 export const signout = async (req, res) => {
     try {
+        const { token } = req.body;
+        const userId = req.user.id; 
+        
+        const revokeResult = await revokeToken(userId, token);
+        if (!revokeResult) {
+            return res.status(400).json({ message: 'Failed to revoke token' });
+        }
+
         await signOut(auth)
             .then(() => {
-                res.status(200).json({ message: 'Successfully signed out' });
+                res.status(200).json({ message: 'Successfully signed out and token revoked' });
             })
             .catch((error) => {
                 throw new Error(error.message);
