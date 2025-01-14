@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x, 23.x]
+        node-version: [23.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -23,8 +23,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Change working directory
+      run: cd /home/ubuntu/actions-runner-backend/_work/surge-social-media/surge-social-media/server
     - name: Install dependencies
-      working-directory: server
       run: npm ci
     - name: Set up environment file
       working-directory: server
