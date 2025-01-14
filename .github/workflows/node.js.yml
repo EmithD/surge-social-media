@@ -26,10 +26,13 @@ jobs:
     - name: Change directory to server
       run: cd server
     - name: Install dependencies
-      run: npm ci
+      run: |
+        cd server
+        npm ci
     - name: Set up environment file
       working-directory: server
       run: |
+        cd server
         touch .env
         echo "${{ secrets.PROD_ENV_FILE }}" > .env
     
