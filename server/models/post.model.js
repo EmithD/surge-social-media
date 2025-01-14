@@ -17,6 +17,11 @@ const PostSchema = mongoose.Schema(
             type: String,
             required: true
         },
+
+        imageDeleteURL: {
+            type: String,
+            required: false
+        },
     },
     {
         timestamps: true
