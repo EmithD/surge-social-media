@@ -34,5 +34,5 @@ jobs:
         npm ci
     - name: Run build
       run: |
-        cd server
+        cd client
         npm run build
