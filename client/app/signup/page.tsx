@@ -5,6 +5,7 @@ import React, { useEffect, useState }from 'react'
 import { useRouter } from 'next/navigation';
 import RightHalf from '../components/RightHalf';
 import LeftHalf from '../components/LeftHalf';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
 
@@ -24,6 +25,7 @@ const SignUp = () => {
     const [fullName, setFullName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [captcha, setCaptcha] = useState<string | null>('');
 
     const [error, setError] = useState<string>('');
 
@@ -33,6 +35,11 @@ const SignUp = () => {
 
         if (password !== confirmPassword) {
             setError('Passwords do not match');
+            return;
+        }
+
+        if(!captcha){
+            setError('Complete ReCaptcha.');
             return;
         }
         
@@ -118,6 +125,8 @@ const SignUp = () => {
                             className="block w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
+
+                        <ReCAPTCHA sitekey={ process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY! } className="block px-4 mb-4" onChange={ setCaptcha } />
 
                         { error && <p className='text-red-600 pb-2 text-center'>{error}</p> }
 
