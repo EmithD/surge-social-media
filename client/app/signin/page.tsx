@@ -1,27 +1,22 @@
 "use client";
 
-import React, { useEffect, useState }from 'react'
+import React, { useState }from 'react'
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import RightHalf from '../components/RightHalf';
 import LeftHalf from '../components/LeftHalf';
-import { useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '../state/store';
-import { setUser } from '../state/user/userSlice';
-import { useSelector } from 'react-redux';
+
 import useIfAuthRedirect from '../hooks/useIfAuthRedirect'
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
-//shit doesnt work without next_public_ prefix
+// doesnt work without next_public_ prefix
 
 const SignIn = () => {
 
     const router = useRouter();
-    const user = useSelector((state: RootState) => state.user);
 
     useIfAuthRedirect('/')
 
-    const dispatch = useDispatch<AppDispatch>();
     const [usernameOrEmail, setusernameOrEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
@@ -53,13 +48,6 @@ const SignIn = () => {
             const { token } = data;
 
             localStorage.setItem("token", token);
-
-            dispatch(setUser({
-                username: data.user.username,
-                email: data.user.email,
-                fullName: data.user.fullName,
-                isVerified: data.user.isVerified
-            }));
 
             router.push("/");
 
