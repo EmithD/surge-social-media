@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "start": "node server",
+    "start": "node index",
     "dev": "nodemon server"
   },
   "keywords": [],
