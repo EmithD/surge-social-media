@@ -3,15 +3,20 @@ import mongoose from 'mongoose';
 const PostSchema = mongoose.Schema(
     {
         userID: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
             required: [true, "Please enter user ID"]
         },
-
+        
         likesCount: {
             type: Number,
             required: true,
             default: 0
         },
+
+        likedBy: [{
+            type: mongoose.Schema.Types.ObjectId, ref: 'User' 
+        }],
 
         imageURL: {
             type: String,

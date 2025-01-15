@@ -26,10 +26,10 @@ export const signUp = async (req, res) => {
         //firebase auth
         const auth = getAuth(app);
         const firebaseUser = await createUserWithEmailAndPassword(auth, email, password)
-                                    .then((userCredential) => userCredential.user)
-                                    .catch((error) => {
-                                        throw new Error(error.message);
-                                    });
+            .then((userCredential) => userCredential.user)
+            .catch((error) => {
+                throw new Error(error.message);
+            });
 
         // Create a new user
         const user = await User.create({
@@ -42,6 +42,7 @@ export const signUp = async (req, res) => {
 
         const {  ...showUser } = user.toObject();
         res.status(201).json(showUser);
+        
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server error' });
     }
