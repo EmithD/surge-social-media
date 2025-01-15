@@ -17,7 +17,8 @@ const UserSchema = mongoose.Schema(
         },
         pfp: {
             type: String,
-            required: false
+            required: false,
+            default: 'https://ibb.co/FKfP3JQ'
         },
         firebaseUid: {
             type: String,

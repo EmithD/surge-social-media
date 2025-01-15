@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
-import productRoute from './routes/product.route.js';
 import connectDB from './config/db.js';
 import authRoute from './routes/auth.route.js';
 import postRoute from './routes/post.route.js'
@@ -19,9 +18,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
-
-//routes
-app.use('/api/products', productRoute);
 
 //auth routes
 app.use('/api/auth', authRoute);
