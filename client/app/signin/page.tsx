@@ -8,6 +8,8 @@ import LeftHalf from '../components/LeftHalf';
 
 import useIfAuthRedirect from '../hooks/useIfAuthRedirect'
 import ReCAPTCHA from 'react-google-recaptcha';
+import BlueButton from '../components/BlueButton';
+import WelcomeLayout from '../components/WelcomeLayout';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKENDBASE_URL;
 // doesnt work without next_public_ prefix
@@ -66,55 +68,45 @@ const SignIn = () => {
 
     return (
 
-        <div className="flex h-screen">
+        <WelcomeLayout title={'Sign in to your account'}>
+            
+            <form onSubmit={handleSignIn} className="text-gray-700 w-full max-w-md space-y-4">
 
-            <LeftHalf>
+                <input
+                    type="text"
+                    placeholder="Username or Email"
+                    id="usernameOrEmail"
+                    value={usernameOrEmail}
+                    onChange={(e) => setusernameOrEmail(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                />
 
-                <h2 className="text-center font-bold text-xl mb-4 text-gray-800">SIGN IN</h2>
+                <input
+                    type="password"
+                    placeholder="Password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                />
 
-                <form onSubmit={ handleSignIn } className="text-gray-700">
-                    
-                    <input
-                        type="text"
-                        placeholder="Username or Email"
-                        id="usernameOrEmail"
-                        value={ usernameOrEmail }
-                        onChange={ (e) => setusernameOrEmail(e.target.value) }
-                        className="block w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                    
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        id='password'
-                        value={ password }
-                        onChange={ (e) => setPassword(e.target.value) }
-                        className="block w-full border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
+                <div className="flex justify-center">
+                    <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} className="mt-4" onChange={setCaptcha} />
+                </div>
 
-                    <ReCAPTCHA sitekey={ process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY! } className="block px-4 mb-4" onChange={ setCaptcha } />
+                {error && <p className="text-red-600 text-center text-sm">{error}</p>}
 
-                    { error && <p className='text-red-600 pb-2 text-center'>{error}</p> }
+                <BlueButton buttonContent= { 'Sign in' } />
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
-                    >
-                        Sign In
-                    </button>
-                    
-                </form>
+            </form>
 
-                <p className='pt-3 text-gray-800 text-center'>New here? <Link href={'/signup'} className='text-blue-800'>Sign Up</Link></p>
+            <p className="text-gray-600 mt-6">
+                New here?{' '} <Link href="/signup" className="text-blue-600 hover:underline"> Sign Up</Link>
+            </p>
 
-            </LeftHalf>
-
-            <RightHalf />
-
-        </div>
-
+        </ WelcomeLayout>
     )
 };
 
