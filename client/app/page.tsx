@@ -527,7 +527,7 @@ const Home = () => {
                         component="label"
                         className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition flex items-center space-x-2"
                     >
-                        <CloudUploadIcon className="text-white" />
+                        {/* <CloudUploadIcon className="text-white" /> */}
                         <span>Upload</span>
                         <input
                             type="file"
@@ -542,7 +542,7 @@ const Home = () => {
                         onClick={ handleSignout }
                         className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-900 transition flex items-center space-x-2"
                     >
-                        <LogoutIcon className="text-white" />
+                        {/* <LogoutIcon className="text-white" /> */}
                         <span>Sign Out</span>
                     </Button>
 
