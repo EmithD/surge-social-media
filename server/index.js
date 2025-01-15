@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import connectDB from './config/db.js';
 import authRoute from './routes/auth.route.js';
 import postRoute from './routes/post.route.js'
+import userRoute from './routes/user.route.js'
 // import csurf from 'csurf';
 // import cookieParser from 'cookie-parser';
 
@@ -24,6 +25,9 @@ app.use('/api/auth', authRoute);
 
 //post routes
 app.use('/api/posts', postRoute)
+
+//user routes
+app.use('/api/user', userRoute);
 
 app.get('/', (req, res) => {
     res.json({
