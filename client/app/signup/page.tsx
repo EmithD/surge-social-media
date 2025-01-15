@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import React, { useEffect, useState }from 'react'
 import { useRouter } from 'next/navigation';
-import RightHalf from '../components/RightHalf';
-import LeftHalf from '../components/LeftHalf';
 import ReCAPTCHA from 'react-google-recaptcha';
 import WelcomeLayout from '../components/WelcomeLayout';
 import BlueButton from '../components/BlueButton';
