@@ -16,7 +16,7 @@ const generateToken = (user) => {
             email: user.email,
         },
         JWT_SECRET,
-        { expiresIn: "30m" }
+        { expiresIn: "120s" }
     );
 };
 

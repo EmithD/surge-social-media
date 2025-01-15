@@ -3,8 +3,7 @@
 import React, {useRef, useState, useEffect} from 'react'
 import useIfAuthRedirect from './hooks/useIfAuthRedirect';
 import { useRouter } from 'next/navigation';
-import ButtonGroup from "@mui/material/ButtonGroup";
-import Button from "@mui/material/Button";
+import LogoutIcon from '@mui/icons-material/Logout';import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {styled} from "@mui/material/styles";
 import LogoOnHome from './components/LogoOnHome';
@@ -23,9 +22,10 @@ interface Post {
 };
 
 interface User {
-    userID?: string,
-    fullName?: string;
-    username?: string;
+    userID: string,
+    fullName: string;
+    username: string;
+    pfpURL: string;
 };
 
 const VisuallyHiddenInput = styled('input') ({
@@ -50,9 +50,13 @@ const Home = () => {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [triggerFetchPosts, setTriggerFetchPosts] = useState(false);
 
+    const [triggerFetchProfile, setTriggerFetchProfile] = useState(false);
+
+    const [pfpURL, setPFPURL] = useState<string>('https://res.cloudinary.com/dvrgbm47v/image/upload/v1736933808/hrqfnkj1ojqkhaa6e2be.png');
+
     const [error, setError] = useState<string>('');
-    const [user, setUser] = useState<User | null>(null);
-    const [userID, setUserID] = useState<string>('');
+    const [user, setUser] = useState<User>();
+    const [userID, setUserID] = useState<string>('')
     
     const lastPostRef = useRef<HTMLDivElement | null>(null);
 
@@ -88,6 +92,7 @@ const Home = () => {
 
                 const data = await res.json();
                 setUserID(data._id);
+                setPFPURL(data.pfp);
                 setUser(data);
 
             } catch (error) {
@@ -98,11 +103,16 @@ const Home = () => {
 
         getUser();
 
-    }, [router]);
+    }, [router, triggerFetchProfile]);
 
     const handlePostUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         const token = localStorage.getItem('token');
+
+        if (!token) {
+            router.push('/signin');
+            return;
+        }
     
         if (!file) {
             console.log("No file selected.");
@@ -110,20 +120,18 @@ const Home = () => {
         }
     
         const formData = new FormData();
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Set in .env file
-        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET; // Set in .env file
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
     
         if (!cloudName || !uploadPreset) {
             console.log("Cloudinary configuration is missing.");
             return;
         }
     
-        // Add Cloudinary-specific fields to FormData
         formData.append('file', file);
         formData.append('upload_preset', uploadPreset);
     
         try {
-            // Upload the image to Cloudinary
             const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                 method: 'POST',
                 body: formData,
@@ -137,8 +145,8 @@ const Home = () => {
             const data = await response.json();
     
             if (data.secure_url) {
+
                 try {
-                    // Send the image URL to your backend
                     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKENDBASE_URL}/api/posts/`, {
                         method: 'POST',
                         headers: {
@@ -148,7 +156,7 @@ const Home = () => {
                         body: JSON.stringify({
                             userID: userID,
                             imageURL: data.secure_url,
-                            publicId: data.public_id, // Optional: Store for future deletion if needed
+                            assetID: data.asset_id,
                         }),
                     });
     
@@ -242,7 +250,7 @@ const Home = () => {
         try {
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKENDBASE_URL}/api/posts/like`, {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
@@ -309,13 +317,98 @@ const Home = () => {
             }
 
             setTriggerFetchPosts((prev) => !prev);
-            router.refresh();
 
         } catch (error) {
 
             console.error("Failed to delete", error);
 
         }
+    };
+
+    const handlePFPUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+        const file = event.target.files?.[0];
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            router.push('/signin');
+            return;
+        }
+    
+        if (!file) {
+            console.log("No file selected.");
+            return;
+        }
+
+        const formData = new FormData();
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    
+        if (!cloudName || !uploadPreset) {
+            console.log("Cloudinary configuration is missing.");
+            return;
+        }
+    
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+    
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+    
+            if (!response.ok) {
+                console.log("Failed to upload pfp to cloudinary.");
+                return;
+            }
+    
+            const data = await response.json();
+
+            if (data.secure_url) {
+
+                try {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKENDBASE_URL}/api/user/uploadPFP`, {
+                        method: 'PUT',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            userID: userID,
+                            imageURL: data.secure_url,
+                        }),
+                    });
+    
+                    if (res.status === 403) {
+                        console.log("Token expired.");
+                        localStorage.removeItem('token');
+                        router.push('/signin');
+                        return;
+                    }
+    
+                    if (!res.ok) {
+                        console.log('Failed to save image data to backend.');
+                        return;
+                    } else {
+                        console.log("Image upload successful and data saved to backend.");
+                        setPFPURL(data.secure_url);
+                        setTriggerFetchProfile((prev) => !prev);
+                        setTriggerFetchPosts((prev) => !prev);
+                    }
+    
+                } catch (error) {
+                    console.log("Error while sending PFP data to backend:", error);
+                }
+    
+            } else {
+                console.log("PFP upload failed:", data);
+            }
+    
+        } catch (error) {
+            console.log("An error occurred during the upload:", error);
+        }
+
     };
 
     return (
@@ -326,91 +419,136 @@ const Home = () => {
 
             <div className="w-3/5 overflow-y-scroll bg-white">
 
-                <div className="p-5">
+                <div className="p-5 space-y-8">
 
                     {posts.map((post, index) => (
                         <div
                             key={post._id}
                             ref={index === posts.length - 1 ? lastPostRef : null}
-                            className="border-b pb-5 mb-5"
+                            className="border border-gray-200 rounded-lg shadow-md p-5"
                         >
-
-                            <div
-                                className="w-full h-full mb-3"
-                            >
-                                <Image
-                                    src={ post.imageURL } 
-                                    alt="Picture" 
-                                    width={1080} 
-                                    height={1080} 
-                                    className="object-contain"
-                                    priority
-                                />
-                                
+                            
+                            {/* image */}
+                            <div className="w-full h-full mb-4">
+                                {post.imageURL ? (
+                                    <Image
+                                        src={post.imageURL}
+                                        alt="Post Picture"
+                                        width={1080}
+                                        height={1080}
+                                        className="object-contain rounded-lg"
+                                        priority
+                                    />
+                                ) : (
+                                    <p className="text-gray-500">Image not available</p>
+                                )}
                             </div>
 
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
+                            {/* imagecontent */}
+                            <div className="flex flex-col space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <Button 
+                                            color="error" 
+                                            className="text-red px-4 py-2 rounded-md hover:bg-red-600 hover:text-white transition"
+                                            onClick={() => handleLike(post._id)}
+                                        >
+                                            Like
+                                        </Button>
+                                        <p className="text-gray-700 font-medium">{post.likesCount}</p>
+                                    </div>
 
-
-                                    <Button color="error" onClick={() => handleLike(post._id)}>
-                                        Like
-                                    </Button>
-
-
-                                    <p className='ml-4'>{post.likesCount}</p>
+                                    <p className="text-gray-600 text-sm font-medium text-center">
+                                        {post.userID.username}
+                                    </p>
                                 </div>
-                                <div className="text-gray-600">{post.userID.username}</div>
 
 
-                                {post.userID._id == userID ? <Button color="error" onClick={() => handleDelete(post._id)}>
-                                        Delete
-                                </Button> : ""}
-
-
-                                <div className="text-gray-400">
+                                <p className="text-gray-400 text-sm text-end">
                                     {new Date(post.createdAt).toLocaleDateString()}
-                                </div>
-                            </div>
+                                </p>
+
+                                {post.userID._id === userID && (
+                                    <Button 
+                                        color="error" 
+                                        className="text-red px-4 py-2 rounded-md hover:bg-red-600 hover:text-white transition"
+                                        onClick={() => handleDelete(post._id)}
+                                    >
+                                        Delete
+                                    </Button>
+                                )}
+                            </div>  
+
                         </div>
                     ))}
 
-                    {!hasMore && <p className="text-center mt-4 text-gray-500">No more posts.</p>}
+                    {!hasMore && (
+                        <p className="text-center text-gray-500 mt-6">
+                            No more posts.
+                        </p>
+                    )}
+
                 </div>
             </div>
 
-            <div className="w-1/5 bg-gray-50 flex flex-col items-center pt-10">
-            
-                <div className="w-24 h-24 rounded-full bg-gray-300 mb-4">
-                    {/* photo */}
-                </div>
-                <h2 className="text-lg font-bold">{user?.fullName || ""}</h2>
-                <p className="text-gray-500">{user?.username || ""}</p>
+            <div className="w-1/5 bg-gray-50 flex flex-col items-center py-10 space-y-6 shadow-lg rounded-lg">
 
-                <div className='pt-4'>
 
-                    <ButtonGroup variant="contained" aria-label="Basic button group" size='small' className=''>
-                        <Button
-                            component="label"
-                            role={undefined}
-                            variant="contained"
-                            tabIndex={-1}
-                            startIcon={<CloudUploadIcon/>}
-                        >
-                            Upload
-                            <VisuallyHiddenInput
-                                type="file"
-                                onChange={ handlePostUpload }
-                                multiple={ false }
-                                accept="image/*"
-                            />
-                        </Button>
-                        <Button color='error' onClick={handleSignout}>Signout</Button>
-                    </ButtonGroup>
-
+                <div className="w-32 h-32 rounded-full overflow-hidden shadow-md">
+                    <Button
+                        component="label"
+                        className="block w-full h-full p-0 border-none bg-transparent cursor-pointer"
+                    >
+                        <Image
+                            src={pfpURL || 'https://res.cloudinary.com/dvrgbm47v/image/upload/v1736933808/hrqfnkj1ojqkhaa6e2be.png'}
+                            alt="Profile Picture"
+                            width={1080}
+                            height={1080}
+                            className="object-cover rounded-full"
+                            priority
+                        />
+                        <input
+                            type="file"
+                            className="hidden"
+                            onChange={handlePFPUpload}
+                            accept="image/*"
+                        />
+                    </Button>
                 </div>
 
+                <div className="text-center space-y-2">
+                    <h2 className="text-xl font-bold text-gray-800">{user?.fullName}</h2>
+                    <p className="text-sm text-gray-500">{user?.username}</p>
+                </div>  
+
+                <div className="pt-4 space-y-3">
+
+                    <Button
+                        component="label"
+                        className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition flex items-center space-x-2"
+                    >
+                        <CloudUploadIcon className="text-white" />
+                        <span>Upload</span>
+                        <input
+                            type="file"
+                            className="hidden"
+                            onChange={ handlePostUpload }
+                            accept="image/*"
+                        />
+                    </Button>
+
+                    <Button
+                        color="error"
+                        onClick={ handleSignout }
+                        className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-900 transition flex items-center space-x-2"
+                    >
+                        <LogoutIcon className="text-white" />
+                        <span>Sign Out</span>
+                    </Button>
+
+                </div>
             </div>
+
 
         </div>
 

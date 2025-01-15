@@ -18,6 +18,11 @@ const PostSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId, ref: 'User' 
         }],
 
+        assetID: {
+            type: String,
+            required: true
+        },
+
         imageURL: {
             type: String,
             required: true
