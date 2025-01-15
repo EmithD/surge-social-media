@@ -3,8 +3,6 @@
 import React, { useState }from 'react'
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import RightHalf from '../components/RightHalf';
-import LeftHalf from '../components/LeftHalf';
 
 import useIfAuthRedirect from '../hooks/useIfAuthRedirect'
 import ReCAPTCHA from 'react-google-recaptcha';
