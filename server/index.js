@@ -6,6 +6,10 @@ import connectDB from './config/db.js';
 import authRoute from './routes/auth.route.js';
 import postRoute from './routes/post.route.js'
 import userRoute from './routes/user.route.js'
+
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
+
 // import csurf from 'csurf';
 // import cookieParser from 'cookie-parser';
 
